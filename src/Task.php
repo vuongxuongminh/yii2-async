@@ -7,30 +7,15 @@
 
 namespace vxm\async;
 
-use yii\base\Event;
+use Spatie\Async\Task as BaseTask;
 
 /**
- * Class AwaitEvent
+ * Async task executable.
  *
  * @author Vuong Minh <vuongxuongminh@gmail.com>
  * @since 1.0.0
  */
-class AwaitEvent extends Event
+abstract class Task extends BaseTask
 {
-
-    /**
-     * @var Async
-     */
-    public $sender;
-
-    /**
-     * @var bool
-     */
-    public $isValid = true;
-
-    /**
-     * @var null|callable
-     */
-    public $intermediateCallback;
 
 }

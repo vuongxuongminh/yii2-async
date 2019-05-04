@@ -9,45 +9,128 @@ namespace vxm\async;
 
 use Yii;
 
+use Exception;
+
 use yii\base\Component;
 
 use Spatie\Async\Pool;
 
 /**
- * Class Async
+ * Support run code async. To use it, you just config it to your application components in configure file:
  *
- * @property int $awaitSleepTime
- * @property int $concurrency
- * @property int $timeout
+ * ```php
+ * 'components' => [
+ *      'async' => 'vxm\async\Async'
+ * ]
+ *
+ * ```
+ *
+ * And after that you can run an async code:
+ *
+ * ```php
+ *
+ * Yii::$app->async(function () {
+ *
+ *      sleep(15);
+ * });
+ *
+ * ```
+ *
+ * If you want to wait until task done, you just to call [[wait]].
+ *
+ * ```php
+ *
+ * Yii::$app->async(function () {
+ *
+ *      sleep(15);
+ * })->wait();
+ *
+ * ```
+ *
+ * Run multi tasks:
+ *
+ * ```php
+ *
+ * Yii::$app->async(function () {
+ *
+ *      sleep(15);
+ * });
+ *
+ * Yii::$app->async(function () {
+ *
+ *      sleep(15);
+ * });
+ *
+ * Yii::$app->async->wait(); // sleep 30s
+ * ```
+ *
+ * @property string $autoload path of autoload file for runtime task execute environment.
+ * @property int $sleepTimeWait time to sleep on wait tasks execute.
+ * @property int $concurrency tasks executable.
+ * @property int $timeout of task executable.
  *
  * @author Vuong Minh <vuongxuongminh@gmail.com>
  * @since 1.0.0
  */
 class Async extends Component
 {
+
     /**
-     * @var Pool
+     * @event SuccessEvent an event that is triggered when task done.
+     */
+    const EVENT_SUCCESS = 'success';
+
+    /**
+     * @event ErrorEvent an event that is triggered when task error.
+     */
+    const EVENT_ERROR = 'error';
+
+    /**
+     * @event \yii\base\Event an event that is triggered when task timeout.
+     */
+    const EVENT_TIMEOUT = 'timeout';
+
+    /**
+     * @var Pool handling tasks.
      */
     protected $pool;
 
     /**
-     * @inheritDoc
+     * Async constructor.
+     *
+     * @param array $config
+     * @throws \yii\base\InvalidConfigException
      */
-    public function init()
+    public function __construct($config = [])
     {
-        $this->pool = Yii::createObject(Pool::class);
+        $pool = $this->pool = Yii::createObject(Pool::class);
+        $pool->autoload(__DIR__ . '/RuntimeAutoload.php');
 
-        parent::init();
+        parent::__construct($config);
     }
 
     /**
-     * @param $callable
-     * @param array $callbacks
+     * Add task to the pool.
+     *
+     * @param callable|\Spatie\Async\Task|Task $callable need to execute.
+     * @param array $callbacks event. Have key is an event name, value is a callable triggered when event happen,
+     * have three events `error`, `success`, `timeout`.
      * @return static
+     * @throws \yii\base\InvalidConfigException
      */
-    public function __invoke($callable, array $callbacks = [])
+    public function addTask($callable, array $callbacks = []): self
     {
-        $process = $this->pool->add($callable);
+        $task = Yii::createObject([
+            'class' => ChildRuntimeTask::class,
+            'app' => Yii::$app,
+            'callable' => $callable
+        ]);
+        $process = $this
+            ->pool
+            ->add($task)
+            ->then([$this, 'success'])
+            ->catch([$this, 'error'])
+            ->timeout([$this, 'timeout']);
 
         foreach ($callbacks as $callback) {
 
@@ -72,26 +155,111 @@ class Async extends Component
     }
 
     /**
-     * @param null $intermediateCallback
+     * This method is called when task executed success.
+     * When overriding this method, make sure you call the parent implementation to ensure the
+     * event is triggered.
+     *
+     * @param mixed $output of task executed.
+     * @throws \yii\base\InvalidConfigException
      */
-    public function await($intermediateCallback = null): void
+    public function success($output): void
     {
-        $this->pool->wait($intermediateCallback);
+        $event = Yii::createObject([
+            'class' => SuccessEvent::class,
+            'output' => $output
+        ]);
+
+        $this->trigger(self::EVENT_SUCCESS, $event);
     }
 
+    /**
+     * This method is called when task executed error.
+     * When overriding this method, make sure you call the parent implementation to ensure the
+     * event is triggered.
+     *
+     * @param Exception $exception throw when task executing.
+     * @throws \yii\base\InvalidConfigException
+     */
+    public function error(Exception $exception): void
+    {
+        $event = Yii::createObject([
+            'class' => ErrorEvent::class,
+            'exception' => $exception
+        ]);
+
+        $this->trigger(self::EVENT_ERROR, $event);
+    }
+
+    /**
+     * This method is called when task executed timeout.
+     * When overriding this method, make sure you call the parent implementation to ensure the
+     * event is triggered.
+     */
+    public function timeout(): void
+    {
+        $this->trigger(self::EVENT_TIMEOUT);
+    }
+
+    /**
+     * An alias of [[addTask()]].
+     *
+     * @param callable $callable task
+     * @param array $callbacks
+     * @return static
+     * @see addTask
+     * @throws \yii\base\InvalidConfigException
+     */
+    public function __invoke($callable, array $callbacks = [])
+    {
+
+        return $this->addTask($callable, $callbacks);
+    }
+
+    /**
+     * Wait until all tasks done.
+     */
+    public function wait(): void
+    {
+        $this->pool->wait();
+    }
+
+    /**
+     * Set concurrency process do tasks.
+     *
+     * @param int $concurrency
+     */
     public function setConcurrency(int $concurrency): void
     {
         $this->pool->concurrency($concurrency);
     }
 
+    /**
+     * Set timeout of task when execute.
+     *
+     * @param int $timeout
+     */
     public function setTimeout(int $timeout): void
     {
         $this->pool->timeout($timeout);
     }
 
-    public function setAwaitSleepTime(int $awaitSleepTime): void
+    /**
+     * Set sleep time when wait tasks execute.
+     *
+     * @param int $sleepTimeWait
+     */
+    public function setSleepTimeWait(int $sleepTimeWait): void
     {
-        $this->pool->sleepTime($awaitSleepTime);
+        $this->pool->sleepTime($sleepTimeWait);
+    }
+
+    /**
+     * Set autoload for environment tasks execute.
+     * @param string $autoload
+     */
+    public function setAutoload(string $autoload): void
+    {
+        $this->pool->autoload(Yii::getAlias($autoload));
     }
 
 }

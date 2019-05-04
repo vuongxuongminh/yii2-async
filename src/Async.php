@@ -194,10 +194,14 @@ class Async extends Component
      * This method is called when task executed timeout.
      * When overriding this method, make sure you call the parent implementation to ensure the
      * event is triggered.
+     *
+     * @throws \yii\base\InvalidConfigException
      */
     public function timeout(): void
     {
-        $this->trigger(self::EVENT_TIMEOUT);
+        $event = Yii::createObject(Event::class);
+
+        $this->trigger(self::EVENT_TIMEOUT, $event);
     }
 
     /**

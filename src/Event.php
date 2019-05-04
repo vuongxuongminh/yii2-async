@@ -7,18 +7,20 @@
 
 namespace vxm\async;
 
+use yii\base\Event as BaseEvent;
+
 /**
- * An event triggered when task executed success.
+ * Async event.
  *
  * @author Vuong Minh <vuongxuongminh@gmail.com>
  * @since 1.0.0
  */
-class SuccessEvent extends Event
+class Event extends BaseEvent
 {
 
     /**
-     * @var mixed output of task executed.
+     * @var Async object triggered this.
      */
-    public $output;
+    public $sender;
 
 }

@@ -7,10 +7,8 @@
 
 namespace vxm\async;
 
-use yii\base\Event;
-
 /**
- * An event trigger when task execute error.
+ * An event trigger when task executed error.
  *
  * @author Vuong Minh <vuongxuongminh@gmail.com>
  * @since 1.0.0

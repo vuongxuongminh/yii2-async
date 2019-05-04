@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<phpunit bootstrap="./test/bootstrap.php"
+         colors="true"
+         verbose="true"
+         convertErrorsToExceptions="true"
+         convertNoticesToExceptions="true"
+         convertWarningsToExceptions="true"
+         stopOnFailure="false"
+         printerClass="vxm\test\unit\async\ResultPrinter">
+    <testsuites>
+        <testsuite name="Test Suite">
+            <directory>./test</directory>
+        </testsuite>
+    </testsuites>
+    <filter>
+        <whitelist>
+            <directory suffix=".php">./src/</directory>
+        </whitelist>
+    </filter>
+</phpunit>

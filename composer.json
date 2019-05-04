@@ -1,0 +1,34 @@
+{
+    "name": "vxm/yii2-async",
+    "description": "Provide an easy way to run code asynchronously for Yii2 application",
+    "type": "yii2-extension",
+    "keywords": ["yii2","extension","yii2-async","async","php-async"],
+    "license": "BSD-3-Clause",
+    "authors": [
+        {
+            "name": "Vuong Minh",
+            "email": "vuongxuongminh@gmail.com"
+        }
+    ],
+    "require": {
+        "php": "^7.1",
+        "yiisoft/yii2": "~2.0.13",
+        "spatie/async": "~1.0.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "vxm\\async\\": "/src"
+        }
+    },
+    "repositories": [
+        {
+            "type": "composer",
+            "url": "https://asset-packagist.org"
+        }
+    ],
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.0.x-dev"
+        }
+    }
+}

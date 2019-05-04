@@ -8,8 +8,7 @@
 namespace vxm\async;
 
 use Yii;
-
-use Exception;
+use Throwable;
 
 use yii\base\Component;
 
@@ -177,14 +176,14 @@ class Async extends Component
      * When overriding this method, make sure you call the parent implementation to ensure the
      * event is triggered.
      *
-     * @param Exception $exception throw when task executing.
+     * @param Throwable $throwable when executing task.
      * @throws \yii\base\InvalidConfigException
      */
-    public function error(Exception $exception): void
+    public function error(Throwable $throwable): void
     {
         $event = Yii::createObject([
             'class' => ErrorEvent::class,
-            'exception' => $exception
+            'throwable' => $throwable
         ]);
 
         $this->trigger(self::EVENT_ERROR, $event);

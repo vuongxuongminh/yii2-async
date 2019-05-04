@@ -17,8 +17,8 @@ class ErrorEvent extends Event
 {
 
     /**
-     * @var \Exception have been throw.
+     * @var \Throwable when executing task.
      */
-    public $exception;
+    public $throwable;
 
 }

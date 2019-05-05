@@ -66,9 +66,6 @@ class TestCase extends BaseTestCase
      */
     protected function destroyApplication(): void
     {
-        $_SERVER['HTTP_USER_AGENT'] = null;
-        $_SERVER['REQUEST_METHOD'] = 'GET';
-
         Yii::$app = null;
     }
 

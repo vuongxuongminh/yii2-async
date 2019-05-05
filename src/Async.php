@@ -28,7 +28,7 @@ use Spatie\Async\Pool;
  *
  * ```php
  *
- * Yii::$app->async(function () {
+ * Yii::$app->async->run(function () {
  *
  *      sleep(15);
  * });
@@ -39,7 +39,7 @@ use Spatie\Async\Pool;
  *
  * ```php
  *
- * Yii::$app->async(function () {
+ * Yii::$app->async->run(function () {
  *
  *      sleep(15);
  * })->wait();
@@ -50,17 +50,17 @@ use Spatie\Async\Pool;
  *
  * ```php
  *
- * Yii::$app->async(function () {
+ * Yii::$app->async->run(function () {
  *
  *      sleep(15);
  * });
  *
- * Yii::$app->async(function () {
+ * Yii::$app->async->run(function () {
  *
  *      sleep(15);
  * });
  *
- * Yii::$app->async->await(); // sleep 30s
+ * Yii::$app->async->wait(); // sleep 30s
  * ```
  *
  * @property string $autoload path of autoload file for runtime task execute environment.
@@ -109,7 +109,7 @@ class Async extends Component
     }
 
     /**
-     * Add task to the pool.
+     * Execute async task.
      *
      * @param callable|\Spatie\Async\Task|Task $callable need to execute.
      * @param array $callbacks event. Have key is an event name, value is a callable triggered when event happen,
@@ -117,7 +117,7 @@ class Async extends Component
      * @return static
      * @throws \yii\base\InvalidConfigException
      */
-    public function addTask($callable, array $callbacks = []): self
+    public function run($callable, array $callbacks = []): self
     {
         $task = Yii::createObject([
             'class' => ChildRuntimeTask::class,
@@ -204,23 +204,9 @@ class Async extends Component
     }
 
     /**
-     * An alias of [[addTask()]].
-     *
-     * @param callable $callable task
-     * @param array $callbacks
-     * @return static
-     * @see addTask
-     * @throws \yii\base\InvalidConfigException
-     */
-    public function __invoke($callable, array $callbacks = [])
-    {
-        return $this->addTask($callable, $callbacks);
-    }
-
-    /**
      * Wait until all tasks done.
      */
-    public function await(): void
+    public function wait(): void
     {
         $this->pool->wait();
     }

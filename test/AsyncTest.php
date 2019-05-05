@@ -28,20 +28,20 @@ class AsyncTest extends TestCase
     {
         $time = time();
 
-        Yii::$app->async(function () {
+        Yii::$app->async->run(function () {
             sleep(10);
         });
 
         $this->assertTrue((time() - $time) < 10);
     }
 
-    public function testAwait()
+    public function testWait()
     {
         $time = time();
 
-        Yii::$app->async(function () {
+        Yii::$app->async->run(function () {
             sleep(10);
-        })->await();
+        })->wait();
 
         $this->assertTrue((time() - $time) >= 10);
     }
@@ -53,7 +53,7 @@ class AsyncTest extends TestCase
             $this->assertEquals(123, $event->output);
         });
 
-        Yii::$app->async(function () {
+        Yii::$app->async->run(function () {
 
             return 123;
         }, [
@@ -71,7 +71,7 @@ class AsyncTest extends TestCase
             $this->assertEquals(Exception::class, get_class($event->throwable));
         });
 
-        Yii::$app->async(function () {
+        Yii::$app->async->run(function () {
 
             throw new Exception('Error');
         }, [
@@ -89,7 +89,7 @@ class AsyncTest extends TestCase
             echo 'global passed';
         });
 
-        Yii::$app->async(function () {
+        Yii::$app->async->run(function () {
 
             sleep(30);
         }, [

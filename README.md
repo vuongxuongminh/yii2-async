@@ -44,7 +44,7 @@ After add it to application components, now you can run an async code:
 
 ```php
 
-Yii::$app->async(function() {
+Yii::$app->async->run(function() {
     
     sleep(30);
 });
@@ -57,7 +57,7 @@ When creating asynchronous processes, you can add the following event hooks on a
 
 ```php
 
-Yii::$app->async(function() {
+Yii::$app->async->run(function() {
 
     if (rand(1, 2) === 1) {
     
@@ -90,16 +90,16 @@ Yii::$app->async(function() {
 
 ```
 
-### Await
+### Wait process
 
 Sometime you need to wait a code executed, just call `await`:
 
 ```php
 
-Yii::$app->async(function() {
+Yii::$app->async->run(function() {
     
     sleep(30);
-})->await(); // sleep 30s
+})->wait(); // sleep 30s
 
 ```
 
@@ -107,17 +107,17 @@ Or you can wait multi tasks executed:
 
 ```php
 
-Yii::$app->async(function() {
+Yii::$app->async->run(function() {
     
     sleep(30);
 });
 
-Yii::$app->async(function() {
+Yii::$app->async->run(function() {
     
     sleep(100);
 });
 
-Yii::$app->async->await(); // sleep 100s not 130s because it's run on multi processes
+Yii::$app->async->wait(); // sleep 100s not 130s because it's run on multi processes
 
 ```
 
@@ -146,6 +146,6 @@ class MyTask extends Task
 
 // Do task async
 
-Yii::$app->async(new MyTask);
+Yii::$app->async->run(new MyTask);
 
 ```

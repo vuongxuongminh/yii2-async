@@ -9,6 +9,8 @@ namespace vxm\test\unit\async;
 
 use Yii;
 
+use Exception;
+
 use vxm\async\Async;
 use vxm\async\Event;
 use vxm\async\ErrorEvent;
@@ -67,7 +69,7 @@ class AsyncTest extends TestCase
 
     public function testErrorEvent()
     {
-        /** @var TestException[] $exceptions */
+        /** @var Exception[] $exceptions */
         $exceptions = [];
         Yii::$app->async->on(Async::EVENT_ERROR, function (ErrorEvent $event) use (&$exceptions) {
 
@@ -76,9 +78,9 @@ class AsyncTest extends TestCase
 
         Yii::$app->async->run(function () {
 
-            throw new TestException('Error');
+            throw new Exception('Error');
         }, [
-            'error' => function (TestException $exception) use (&$exceptions) {
+            'error' => function (Exception $exception) use (&$exceptions) {
 
                 $exceptions[] = $exception;
             }
@@ -86,7 +88,7 @@ class AsyncTest extends TestCase
 
         foreach ($exceptions as $exception) {
             $this->assertEquals('Error', $exception->getMessage());
-            $this->assertEquals(TestException::class, get_class($exception));
+            $this->assertEquals(Exception::class, get_class($exception));
         }
 
     }

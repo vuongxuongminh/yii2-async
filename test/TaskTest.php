@@ -28,7 +28,7 @@ class TaskTest extends TestCase
             }
         ])->wait();
 
-        $this->assertTrue($result);
+        $this->assertEquals('yii\console\Request', $result);
     }
 
 }

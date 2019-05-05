@@ -36,6 +36,6 @@ class TaskRunnerTest extends Task
 
     public function run()
     {
-        return get_class($this->request) === 'yii\console\Request';
+        return get_class($this->request);
     }
 }

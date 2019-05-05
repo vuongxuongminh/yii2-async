@@ -60,7 +60,7 @@ use Spatie\Async\Pool;
  *      sleep(15);
  * });
  *
- * Yii::$app->async->wait(); // sleep 30s
+ * Yii::$app->async->await(); // sleep 30s
  * ```
  *
  * @property string $autoload path of autoload file for runtime task execute environment.
@@ -131,9 +131,9 @@ class Async extends Component
             ->catch([$this, 'error'])
             ->timeout([$this, 'timeout']);
 
-        foreach ($callbacks as $callback) {
+        foreach ($callbacks as $name => $callback) {
 
-            switch (strtolower($callback)) {
+            switch (strtolower($name)) {
                 case 'timeout':
                     $process->timeout($callback);
                     break;
@@ -214,14 +214,13 @@ class Async extends Component
      */
     public function __invoke($callable, array $callbacks = [])
     {
-
         return $this->addTask($callable, $callbacks);
     }
 
     /**
      * Wait until all tasks done.
      */
-    public function wait(): void
+    public function await(): void
     {
         $this->pool->wait();
     }

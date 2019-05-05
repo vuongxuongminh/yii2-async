@@ -31,7 +31,7 @@ class AsyncTest extends TestCase
             usleep(1000);
         });
 
-        $this->assertLessThan(500, $this->stopwatch->stop('test'));
+        $this->assertLessThan(500, $this->stopwatch->stop('test')->getDuration());
     }
 
     public function testWait()
@@ -42,7 +42,7 @@ class AsyncTest extends TestCase
             usleep(1000);
         })->wait();
 
-        $this->assertGreaterThan(500, $this->stopwatch->stop('test'));
+        $this->assertGreaterThan(500, $this->stopwatch->stop('test')->getDuration());
     }
 
     public function testSuccessEvent()
@@ -55,14 +55,14 @@ class AsyncTest extends TestCase
 
         Yii::$app->async->run(function () {
 
-            return 1;
+            return 5;
         }, [
             'success' => function ($output) use (&$result) {
                 $result += $output;
             }
         ])->wait();
 
-        $this->assertEquals(2, $result);
+        $this->assertEquals(10, $result);
     }
 
     public function testErrorEvent()
@@ -85,7 +85,7 @@ class AsyncTest extends TestCase
         ])->wait();
 
         foreach ($exceptions as $exception) {
-            $this->assertEquals('Error', $exception->getMessage());
+            $this->assertEquals('Error', $exception->getMessage(), implode(PHP_EOL, $exception->getTrace()));
             $this->assertEquals(TestException::class, get_class($exception));
         }
 
@@ -93,21 +93,21 @@ class AsyncTest extends TestCase
 
     public function testTimeoutEvent()
     {
-        Yii::$app->async->on(Async::EVENT_ERROR, function (Event $event) {
+        $counter = 0;
 
-            echo 'global passed';
-            $this->assertTrue(true);
+        Yii::$app->async->on(Async::EVENT_TIMEOUT, function (Event $event) use (&$counter) {
+            $counter++;
         });
 
         Yii::$app->async->run(function () {
 
             sleep(6);
         }, [
-            'timeout' => function () {
-
-                echo 'custom passed';
-                $this->assertTrue(true);
+            'timeout' => function () use (&$counter) {
+                $counter++;
             }
         ])->wait();
+
+        $this->assertEquals(2, $counter);
     }
 }

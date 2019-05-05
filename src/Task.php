@@ -7,7 +7,7 @@
 
 namespace vxm\async;
 
-use Spatie\Async\Task as BaseTask;
+use yii\base\BaseObject;
 
 /**
  * Async task executable.
@@ -15,7 +15,32 @@ use Spatie\Async\Task as BaseTask;
  * @author Vuong Minh <vuongxuongminh@gmail.com>
  * @since 1.0.0
  */
-abstract class Task extends BaseTask
+abstract class Task extends BaseObject
 {
+
+    /**
+     * Call before run task for setting up environment.
+     */
+    abstract public function configure(): void;
+
+    /**
+     * Task executable.
+     *
+     * @return mixed
+     */
+    abstract public function run();
+
+    /**
+     * Magic call in child runtime process.
+     *
+     * @return mixed result of this task.
+     * @see [[run()]]
+     */
+    public function __invoke()
+    {
+        $this->configure();
+
+        return $this->run();
+    }
 
 }

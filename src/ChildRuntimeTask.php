@@ -9,15 +9,13 @@ namespace vxm\async;
 
 use Yii;
 
-use yii\base\Configurable;
-
 /**
  * Async task executable in child runtime process.
  *
  * @author Vuong Minh <vuongxuongminh@gmail.com>
  * @since 1.0.0
  */
-class ChildRuntimeTask extends Task implements Configurable
+class ChildRuntimeTask extends Task
 {
     /**
      * @var \yii\console\Application|\yii\web\Application for configure environment.
@@ -30,19 +28,9 @@ class ChildRuntimeTask extends Task implements Configurable
     public $callable;
 
     /**
-     * Task constructor.
-     *
-     * @param array $config
-     */
-    public function __construct(array $config)
-    {
-        Yii::configure($this, $config);
-    }
-
-    /**
      * @inheritDoc
      */
-    public function configure()
+    public function configure(): void
     {
         Yii::$app = $this->app;
     }

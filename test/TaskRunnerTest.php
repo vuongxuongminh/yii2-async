@@ -20,7 +20,7 @@ use vxm\async\Task;
 class TaskRunnerTest extends Task
 {
     /**
-     * @var \yii\web\Request
+     * @var \yii\console\Request
      */
     public $request;
 

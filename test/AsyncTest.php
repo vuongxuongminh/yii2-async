@@ -28,7 +28,7 @@ class AsyncTest extends TestCase
         $this->stopwatch->start('test');
 
         Yii::$app->async->run(function () {
-            usleep(1000);
+            usleep(5000);
         });
 
         $this->assertLessThan(500, $this->stopwatch->stop('test')->getDuration());
@@ -39,7 +39,7 @@ class AsyncTest extends TestCase
         $this->stopwatch->start('test');
 
         Yii::$app->async->run(function () {
-            usleep(1000);
+            usleep(5000);
         })->wait();
 
         $this->assertGreaterThan(500, $this->stopwatch->stop('test')->getDuration());
@@ -85,7 +85,7 @@ class AsyncTest extends TestCase
         ])->wait();
 
         foreach ($exceptions as $exception) {
-            $this->assertEquals('Error', $exception->getMessage(), implode(PHP_EOL, $exception->getTrace()));
+            $this->assertEquals('Error', $exception->getMessage());
             $this->assertEquals(TestException::class, get_class($exception));
         }
 

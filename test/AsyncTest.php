@@ -26,49 +26,48 @@ class AsyncTest extends TestCase
 
     public function testAsync()
     {
-        $time = microtime();
+        $time = microtime(false);
 
         Yii::$app->async->run(function () {
             usleep(1000);
         });
 
-        $this->assertTrue((microtime() - $time) < 500);
+        $this->assertTrue((microtime(false) - $time) < 500);
     }
 
     public function testWait()
     {
-        $time = microtime();
+        $time = microtime(false);
 
         Yii::$app->async->run(function () {
             usleep(1000);
         })->wait();
 
-        $this->assertTrue((microtime() - $time) > 500);
+        $this->assertTrue((microtime(false) - $time) > 500);
     }
 
     public function testSuccessEvent()
     {
-        Yii::$app->async->on(Async::EVENT_SUCCESS, function (SuccessEvent $event) {
+        $output = '';
+        $callback = function (SuccessEvent $event) use (&$output) {
+            $output .= $event->output;
+        };
 
-            $this->assertEquals(123, $event->output);
-        });
+        Yii::$app->async->on(Async::EVENT_SUCCESS, $callback);
 
         Yii::$app->async->run(function () {
 
             return 123;
-        }, [
-            'success' => function ($result) {
+        }, ['success' => $callback])->wait();
 
-                $this->assertEquals(123, $result);
-            }
-        ])->wait();
+        $this->assertEquals(123123, $output);
     }
 
     public function testErrorEvent()
     {
         Yii::$app->async->on(Async::EVENT_ERROR, function (ErrorEvent $event) {
 
-            $this->assertEquals(Exception::class, get_class($event->throwable));
+            $this->assertEquals('Error', $event->throwable->getMessage());
         });
 
         Yii::$app->async->run(function () {
@@ -77,7 +76,7 @@ class AsyncTest extends TestCase
         }, [
             'error' => function (Exception $exception) {
 
-                $this->assertEquals(Exception::class, get_class($exception));
+                $this->assertEquals('Error', $exception->getMessage());
             }
         ])->wait();
     }

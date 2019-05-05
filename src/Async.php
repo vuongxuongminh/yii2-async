@@ -14,6 +14,7 @@ use Throwable;
 use yii\base\Component;
 
 use Spatie\Async\Pool;
+use Spatie\Async\Runtime\ParentRuntime;
 
 /**
  * Support run code async. To use it, you just config it to your application components in configure file:
@@ -125,9 +126,7 @@ class Async extends Component
             'app' => Yii::$app,
             'callable' => $callable
         ]);
-        $process = $this
-            ->pool
-            ->add($task)
+        $process = ParentRuntime::createProcess($task)
             ->then(Closure::fromCallable([$this, 'success']))
             ->catch(Closure::fromCallable([$this, 'error']))
             ->timeout(Closure::fromCallable([$this, 'timeout']));
@@ -135,9 +134,6 @@ class Async extends Component
         foreach ($callbacks as $name => $callback) {
 
             switch (strtolower($name)) {
-                case 'timeout':
-                    $process->timeout($callback);
-                    break;
                 case 'success':
                     $process->then($callback);
                     break;
@@ -145,11 +141,16 @@ class Async extends Component
                 case 'catch':
                     $process->catch($callback);
                     break;
+                case 'timeout':
+                    $process->timeout($callback);
+                    break;
                 default:
                     break;
             }
 
         }
+
+        $this->pool->add($process);
 
         return $this;
     }

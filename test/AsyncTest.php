@@ -43,7 +43,7 @@ class AsyncTest extends TestCase
             sleep(3);
         })->wait();
 
-        $this->assertTrue((time() - $time) >= 2);
+        $this->assertTrue((time() - $time) > 2);
     }
 
     public function testSuccessEvent()

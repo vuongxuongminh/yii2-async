@@ -8,6 +8,7 @@
 namespace vxm\async;
 
 use Yii;
+use Closure;
 use Throwable;
 
 use yii\base\Component;
@@ -127,9 +128,9 @@ class Async extends Component
         $process = $this
             ->pool
             ->add($task)
-            ->then([$this, 'success'])
-            ->catch([$this, 'error'])
-            ->timeout([$this, 'timeout']);
+            ->then(Closure::fromCallable([$this, 'success']))
+            ->catch(Closure::fromCallable([$this, 'error']))
+            ->timeout(Closure::fromCallable([$this, 'timeout']));
 
         foreach ($callbacks as $name => $callback) {
 

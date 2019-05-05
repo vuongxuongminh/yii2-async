@@ -50,19 +50,13 @@ class TestCase extends BaseTestCase
      * @param array $config The application configuration, if needed
      * @param string $appClass name of the application class to create
      */
-    protected function mockApplication($config = [], $appClass = '\yii\web\Application'): void
+    protected function mockApplication($config = [], $appClass = '\yii\console\Application'): void
     {
         new $appClass(ArrayHelper::merge([
             'id' => 'test',
             'basePath' => __DIR__,
             'vendorPath' => dirname(__DIR__) . '/vendor',
             'components' => [
-                'request' => [
-                    'cookieValidationKey' => 'wefJDF8sfdsfSDefwqdxj9oq',
-                    'scriptFile' => __DIR__ . '/index.php',
-                    'scriptUrl' => '/index.php',
-                    'url' => 'http://abc.test'
-                ],
                 'async' => [
                     'class' => 'vxm\async\Async',
                     'timeout' => 5

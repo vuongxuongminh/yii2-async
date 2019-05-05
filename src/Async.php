@@ -117,16 +117,10 @@ class Async extends Component
      * @param array $callbacks event. Have key is an event name, value is a callable triggered when event happen,
      * have three events `error`, `success`, `timeout`.
      * @return static
-     * @throws \yii\base\InvalidConfigException
      */
     public function run($callable, array $callbacks = []): self
     {
-        $task = Yii::createObject([
-            'class' => ChildRuntimeTask::class,
-            'app' => Yii::$app,
-            'callable' => $callable
-        ]);
-        $process = ParentRuntime::createProcess($task)
+        $process = ParentRuntime::createProcess($callable)
             ->then(Closure::fromCallable([$this, 'success']))
             ->catch(Closure::fromCallable([$this, 'error']))
             ->timeout(Closure::fromCallable([$this, 'timeout']));
@@ -135,14 +129,14 @@ class Async extends Component
 
             switch (strtolower($name)) {
                 case 'success':
-                    $process->then($callback);
+                    $process->then(Closure::fromCallable($callback));
                     break;
                 case 'error':
                 case 'catch':
-                    $process->catch($callback);
+                    $process->catch(Closure::fromCallable($callback));
                     break;
                 case 'timeout':
-                    $process->timeout($callback);
+                    $process->timeout(Closure::fromCallable($callback));
                     break;
                 default:
                     break;

@@ -19,11 +19,6 @@ abstract class Task extends BaseObject
 {
 
     /**
-     * Call before run task for setting up environment.
-     */
-    abstract public function configure(): void;
-
-    /**
      * Task executable.
      *
      * @return mixed
@@ -38,8 +33,6 @@ abstract class Task extends BaseObject
      */
     public function __invoke()
     {
-        $this->configure();
-
         return $this->run();
     }
 

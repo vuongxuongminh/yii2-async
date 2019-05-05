@@ -97,6 +97,6 @@ class AsyncTest extends TestCase
 
                 echo 'custom passed';
             }
-        ])->await();
+        ])->wait();
     }
 }

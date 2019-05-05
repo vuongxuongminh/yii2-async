@@ -92,7 +92,7 @@ Yii::$app->async->run(function() {
 
 ### Wait process
 
-Sometime you need to wait a code executed, just call `await`:
+Sometime you need to wait a code executed, just call `wait()` after `run()`:
 
 ```php
 

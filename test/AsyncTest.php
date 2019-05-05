@@ -8,7 +8,6 @@
 namespace vxm\test\unit\async;
 
 use Yii;
-use Exception;
 
 use vxm\async\Async;
 use vxm\async\Event;
@@ -26,59 +25,70 @@ class AsyncTest extends TestCase
 
     public function testAsync()
     {
-        $time = microtime(false);
+        $this->stopwatch->start('test');
 
         Yii::$app->async->run(function () {
             usleep(1000);
         });
 
-        $this->assertTrue((microtime(false) - $time) < 500);
+        $this->assertLessThan(500, $this->stopwatch->stop('test'));
     }
 
     public function testWait()
     {
-        $time = microtime(false);
+        $this->stopwatch->start('test');
 
         Yii::$app->async->run(function () {
             usleep(1000);
         })->wait();
 
-        $this->assertTrue((microtime(false) - $time) > 500);
+        $this->assertGreaterThan(500, $this->stopwatch->stop('test'));
     }
 
     public function testSuccessEvent()
     {
-        $output = '';
-        $callback = function (SuccessEvent $event) use (&$output) {
-            $output .= $event->output;
-        };
+        $result = 0;
 
-        Yii::$app->async->on(Async::EVENT_SUCCESS, $callback);
-
-        Yii::$app->async->run(function () {
-
-            return 123;
-        }, ['success' => $callback])->wait();
-
-        $this->assertEquals(123123, $output);
-    }
-
-    public function testErrorEvent()
-    {
-        Yii::$app->async->on(Async::EVENT_ERROR, function (ErrorEvent $event) {
-
-            $this->assertEquals('Error', $event->throwable->getMessage());
+        Yii::$app->async->on(Async::EVENT_SUCCESS, function (SuccessEvent $event) use (&$result) {
+            $result += $event->output;
         });
 
         Yii::$app->async->run(function () {
 
-            throw new Exception('Error');
+            return 1;
         }, [
-            'error' => function (Exception $exception) {
-
-                $this->assertEquals('Error', $exception->getMessage());
+            'success' => function ($output) use (&$result) {
+                $result += $output;
             }
         ])->wait();
+
+        $this->assertEquals(2, $result);
+    }
+
+    public function testErrorEvent()
+    {
+        /** @var TestException[] $exceptions */
+        $exceptions = [];
+        Yii::$app->async->on(Async::EVENT_ERROR, function (ErrorEvent $event) use (&$exceptions) {
+
+            $exceptions[] = $event->throwable;
+        });
+
+        Yii::$app->async->run(function () {
+
+            throw new TestException('Error');
+        }, [
+            'error' => function (TestException $exception) use (&$exceptions) {
+
+                $exceptions[] = $exception;
+            }
+        ])->wait();
+
+        foreach ($exceptions as $exception) {
+            $this->assertEquals('Error', $exception->getMessage());
+            $this->assertEquals(TestException::class, get_class($exception));
+        }
+
     }
 
     public function testTimeoutEvent()

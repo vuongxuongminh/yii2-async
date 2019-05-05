@@ -9,9 +9,11 @@ namespace vxm\test\unit\async;
 
 use Yii;
 
-use yii\helpers\ArrayHelper;
+use Symfony\Component\Stopwatch\Stopwatch;
 
 use PHPUnit\Framework\TestCase as BaseTestCase;
+
+use yii\helpers\ArrayHelper;
 
 /**
  * Class TestCase
@@ -21,13 +23,17 @@ use PHPUnit\Framework\TestCase as BaseTestCase;
  */
 class TestCase extends BaseTestCase
 {
-
+    /**
+     * @var Stopwatch
+     */
+    protected $stopwatch;
 
     public function setUp(): void
     {
         parent::setUp();
 
         $this->mockApplication();
+        $this->stopwatch = new Stopwatch;
     }
 
     public function tearDown(): void
@@ -35,6 +41,7 @@ class TestCase extends BaseTestCase
         parent::tearDown();
 
         $this->destroyApplication();
+        $this->stopwatch = null;
     }
 
     /**

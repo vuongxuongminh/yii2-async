@@ -7,11 +7,11 @@
 
 namespace vxm\test\unit\async;
 
-use vxm\async\Event;
 use Yii;
 use Exception;
 
 use vxm\async\Async;
+use vxm\async\Event;
 use vxm\async\ErrorEvent;
 use vxm\async\SuccessEvent;
 
@@ -26,24 +26,24 @@ class AsyncTest extends TestCase
 
     public function testAsync()
     {
-        $time = time();
+        $time = microtime();
 
         Yii::$app->async->run(function () {
-            sleep(3);
+            usleep(1000);
         });
 
-        $this->assertTrue((time() - $time) < 2);
+        $this->assertTrue((microtime() - $time) < 500);
     }
 
     public function testWait()
     {
-        $time = time();
+        $time = microtime();
 
         Yii::$app->async->run(function () {
-            sleep(3);
+            usleep(1000);
         })->wait();
 
-        $this->assertTrue((time() - $time) > 2);
+        $this->assertTrue((microtime() - $time) > 500);
     }
 
     public function testSuccessEvent()
@@ -61,7 +61,7 @@ class AsyncTest extends TestCase
 
                 $this->assertEquals(123, $result);
             }
-        ]);
+        ])->wait();
     }
 
     public function testErrorEvent()
@@ -79,7 +79,7 @@ class AsyncTest extends TestCase
 
                 $this->assertEquals(Exception::class, get_class($exception));
             }
-        ]);
+        ])->wait();
     }
 
     public function testTimeoutEvent()

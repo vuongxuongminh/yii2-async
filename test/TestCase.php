@@ -56,7 +56,10 @@ class TestCase extends BaseTestCase
                     'scriptUrl' => '/index.php',
                     'url' => 'http://abc.test'
                 ],
-                'async' => 'vxm\async\Async'
+                'async' => [
+                    'class' => 'vxm\async\Async',
+                    'timeout' => 5
+                ]
             ]
         ], $config));
     }

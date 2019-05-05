@@ -29,10 +29,10 @@ class AsyncTest extends TestCase
         $time = time();
 
         Yii::$app->async->run(function () {
-            sleep(10);
+            sleep(3);
         });
 
-        $this->assertTrue((time() - $time) < 10);
+        $this->assertTrue((time() - $time) < 2);
     }
 
     public function testWait()
@@ -40,10 +40,10 @@ class AsyncTest extends TestCase
         $time = time();
 
         Yii::$app->async->run(function () {
-            sleep(10);
+            sleep(3);
         })->wait();
 
-        $this->assertTrue((time() - $time) >= 10);
+        $this->assertTrue((time() - $time) >= 2);
     }
 
     public function testSuccessEvent()
@@ -87,15 +87,17 @@ class AsyncTest extends TestCase
         Yii::$app->async->on(Async::EVENT_ERROR, function (Event $event) {
 
             echo 'global passed';
+            $this->assertTrue(true);
         });
 
         Yii::$app->async->run(function () {
 
-            sleep(30);
+            sleep(6);
         }, [
             'timeout' => function () {
 
                 echo 'custom passed';
+                $this->assertTrue(true);
             }
         ])->wait();
     }

@@ -33,10 +33,33 @@ Add the component to your application configure file:
 ```php
 [
     'components' => [
-        'async' => 'vxm\async\Async'
+        'async' => [
+            'class' => 'vxm\async\Async',
+            'appConfigFile' => '@app/config/async.php'
+        ]
     ]
 ]
 ```
+
+Because async code run in difference process you need to setup yii environment to use 
+components via property `appConfigFile`. Example of an async app config file:
+
+```php
+define('YII_ENV', 'dev');
+define('YII_DEBUG', true);
+
+return [
+    'id' => 'async-app',
+    'basePath' => __DIR__,
+    'runtimePath' => __DIR__ . '/runtime',
+    'aliases' => [
+        '@frontend' => dirname(__DIR__, 2) . '/frontend',
+        '@backend' => dirname(__DIR__, 2) . '/backend'
+    ]
+];
+```
+
+Make sure all of your aliases define in it to support an autoload.
 
 ### Run async code
 
@@ -46,7 +69,7 @@ After add it to application components, now you can run an async code:
 
 Yii::$app->async->run(function() {
     
-    sleep(30);
+    Yii::$app->mailer->compose('mail')->send();
 });
 
 ```
@@ -98,8 +121,8 @@ Sometime you need to wait a code executed, just call `wait()` after `run()`:
 
 Yii::$app->async->run(function() {
     
-    sleep(30);
-})->wait(); // sleep 30s
+    sleep(10);
+})->wait(); // sleep 10s
 
 ```
 
@@ -109,22 +132,22 @@ Or you can wait multi tasks executed:
 
 Yii::$app->async->run(function() {
     
-    sleep(30);
+    sleep(5);
 });
 
 Yii::$app->async->run(function() {
     
-    sleep(100);
+    sleep(10);
 });
 
-Yii::$app->async->wait(); // sleep 100s not 130s because it's run on multi processes
+Yii::$app->async->wait(); // sleep 10s not 15s because it's run on multi processes
 
 ```
 
 ### Working with task
 
 Besides using closures, you can also work with a Task. A Task is useful in situations where you need more setup work in the child process. 
-Because a child process is always bootstrapped from nothing, chances are you'll want to initialise eg. the application components before executing the task. 
+
 The Task class makes this easier to do.
 
 ```php
@@ -133,19 +156,22 @@ use vxm\async\Task;
 
 class MyTask extends Task
 {
-    public function configure()
-    {
-        // Setup eg. load config, properties, components...
-    }
+
+    public $productId;
+    
 
     public function run()
     {
         // Do the real work here.
+       
     }
 }
 
-// Do task async
+// Do task async use like an anonymous above.
 
-Yii::$app->async->run(new MyTask);
+Yii::$app->async->run(new MyTask([
+    'productId' => 123
+
+]));
 
 ```

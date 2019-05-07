@@ -116,7 +116,7 @@ class Async extends Component
     public function __construct($config = [])
     {
         $pool = $this->pool = Yii::createObject(Pool::class);
-        $pool->autoload(__DIR__ . '/RuntimeAutoload.php');
+        $pool->autoload(__DIR__ . '/runtime/AutoloadRuntime.php');
 
         parent::__construct($config);
     }

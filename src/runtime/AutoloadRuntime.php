@@ -13,16 +13,16 @@ new class
 {
     const AUTOLOAD_PATHS = [
         [
+            __DIR__ . '/../../../../autoload.php',
             __DIR__ . '/../../../autoload.php',
-            __DIR__ . '/../../autoload.php',
-            __DIR__ . '/../vendor/autoload.php',
-            __DIR__ . '/../../vendor/autoload.php'
+            __DIR__ . '/../../vendor/autoload.php',
+            __DIR__ . '/../../../vendor/autoload.php'
         ],
         [
+            __DIR__ . '/../../../../yiisoft/yii2/Yii.php',
             __DIR__ . '/../../../yiisoft/yii2/Yii.php',
-            __DIR__ . '/../../yiisoft/yii2/Yii.php',
-            __DIR__ . '/../vendor/yiisoft/yii2/Yii.php',
-            __DIR__ . '/../../vendor/yiisoft/yii2/Yii.php'
+            __DIR__ . '/../../vendor/yiisoft/yii2/Yii.php',
+            __DIR__ . '/../../../vendor/yiisoft/yii2/Yii.php'
         ]
     ];
 

@@ -152,6 +152,11 @@ class Async extends Component
 
         }
 
+        $process
+            ->then(Closure::fromCallable([$this, 'success']))
+            ->catch(Closure::fromCallable([$this, 'error']))
+            ->timeout(Closure::fromCallable([$this, 'timeout']));
+
         $this->pool->add($process);
 
         return $this;
@@ -265,17 +270,14 @@ class Async extends Component
     }
 
     /**
-     * Create an async process with hooked events.
+     * Create an async process.
      *
      * @param callable|\Spatie\Async\Task|Task $callable need to execute.
      * @return Runnable process.
      */
     protected function createProcess($callable): Runnable
     {
-        return ParentRuntime::createProcess([$callable, $this->appConfigFile])
-            ->then(Closure::fromCallable([$this, 'success']))
-            ->catch(Closure::fromCallable([$this, 'error']))
-            ->timeout(Closure::fromCallable([$this, 'timeout']));
+        return ParentRuntime::createProcess([$callable, $this->appConfigFile]);
     }
 
 }

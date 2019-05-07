@@ -30,7 +30,7 @@ class AsyncTest extends TestCase
         $this->stopwatch->start('test');
 
         Yii::$app->async->run(function () {
-            usleep(1000);
+            usleep(3000);
         });
 
         $this->assertLessThan(100, $this->stopwatch->stop('test')->getDuration());
@@ -41,7 +41,7 @@ class AsyncTest extends TestCase
         $this->stopwatch->start('test');
 
         Yii::$app->async->run(function () {
-            usleep(1000);
+            usleep(3000);
         })->wait();
 
         $this->assertGreaterThan(100, $this->stopwatch->stop('test')->getDuration());

@@ -35,7 +35,7 @@ Add the component to your application configure file:
     'components' => [
         'async' => [
             'class' => 'vxm\async\Async',
-            'appConfigFile' => '@app/config/async.php'
+            'appConfigFile' => '@app/config/async.php' // optional when you need to use yii feature in async process.
         ]
     ]
 ]

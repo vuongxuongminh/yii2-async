@@ -59,7 +59,8 @@ class TestCase extends BaseTestCase
             'components' => [
                 'async' => [
                     'class' => 'vxm\async\Async',
-                    'timeout' => 5
+                    'timeout' => 5,
+                    'appConfigFile' => __DIR__ . '/child-app-config.php'
                 ]
             ]
         ], $config));

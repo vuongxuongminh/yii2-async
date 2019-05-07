@@ -14,7 +14,12 @@ use Throwable;
 use yii\base\Component;
 
 use Spatie\Async\Pool;
-use Spatie\Async\Runtime\ParentRuntime;
+use Spatie\Async\Process\Runnable;
+
+use vxm\async\event\Event;
+use vxm\async\event\ErrorEvent;
+use vxm\async\event\SuccessEvent;
+use vxm\async\runtime\ParentRuntime;
 
 /**
  * Support run code async. To use it, you just config it to your application components in configure file:
@@ -97,6 +102,12 @@ class Async extends Component
     protected $pool;
 
     /**
+     * @var string a file config of an application run in child process.
+     * Note: If an autoload file's set, it will not affect, you need to invoke an app in your autoload if needed.
+     */
+    protected $appConfigFile;
+
+    /**
      * Async constructor.
      *
      * @param array $config
@@ -120,10 +131,7 @@ class Async extends Component
      */
     public function run($callable, array $callbacks = []): self
     {
-        $process = ParentRuntime::createProcess($callable)
-            ->then(Closure::fromCallable([$this, 'success']))
-            ->catch(Closure::fromCallable([$this, 'error']))
-            ->timeout(Closure::fromCallable([$this, 'timeout']));
+        $process = $this->createProcess($callable);
 
         foreach ($callbacks as $name => $callback) {
 
@@ -239,11 +247,35 @@ class Async extends Component
 
     /**
      * Set autoload for environment tasks execute.
-     * @param string $autoload
+     * @param string $autoload it can use at an alias.
      */
     public function setAutoload(string $autoload): void
     {
         $this->pool->autoload(Yii::getAlias($autoload));
+    }
+
+    /**
+     * Set an application config file for invoke in child runtime process.
+     *
+     * @param string $appConfigFile it can use at an alias.
+     */
+    public function setAppConfigFile(string $appConfigFile): void
+    {
+        $this->appConfigFile = Yii::getAlias($appConfigFile);
+    }
+
+    /**
+     * Create an async process with hooked events.
+     *
+     * @param callable|\Spatie\Async\Task|Task $callable need to execute.
+     * @return Runnable process.
+     */
+    protected function createProcess($callable): Runnable
+    {
+        return ParentRuntime::createProcess([$callable, $this->appConfigFile])
+            ->then(Closure::fromCallable([$this, 'success']))
+            ->catch(Closure::fromCallable([$this, 'error']))
+            ->timeout(Closure::fromCallable([$this, 'timeout']));
     }
 
 }

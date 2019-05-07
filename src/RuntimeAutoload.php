@@ -31,6 +31,11 @@ new class
      */
     public function __construct()
     {
+        if ($appConfigFile = $_SERVER['argv'][3] ?? null) {
+
+            $appConfig = require($appConfigFile); // require first for define YII_ENV and YII_DEBUG.
+        }
+
         foreach (self::AUTOLOAD_PATHS as $paths) {
 
             foreach ($paths as $path) {
@@ -43,7 +48,12 @@ new class
                 }
 
             }
+        }
 
+        if (isset($appConfig)) {
+
+            new \yii\console\Application($appConfig);
         }
     }
 };
+

@@ -5,22 +5,22 @@
  * @license [New BSD License](http://www.opensource.org/licenses/bsd-license.php)
  */
 
-namespace vxm\async;
+namespace vxm\test\unit\async;
 
-use yii\base\Event as BaseEvent;
+use vxm\async\Task;
 
 /**
- * Async event.
+ * Class TaskRunnerTimeoutTest
  *
  * @author Vuong Minh <vuongxuongminh@gmail.com>
  * @since 1.0.0
  */
-class Event extends BaseEvent
+class TaskRunnerTimeoutTest extends Task
 {
 
-    /**
-     * @var Async object triggered this.
-     */
-    public $sender;
+    public function run()
+    {
+        sleep(6);
+    }
 
 }

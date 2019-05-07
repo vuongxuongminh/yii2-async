@@ -5,20 +5,20 @@
  * @license [New BSD License](http://www.opensource.org/licenses/bsd-license.php)
  */
 
-namespace vxm\async;
+namespace vxm\async\event;
 
 /**
- * An event triggered when task executed success.
+ * An event trigger when task executed error.
  *
  * @author Vuong Minh <vuongxuongminh@gmail.com>
  * @since 1.0.0
  */
-class SuccessEvent extends Event
+class ErrorEvent extends Event
 {
 
     /**
-     * @var mixed output of task executed.
+     * @var \Throwable when executing task.
      */
-    public $output;
+    public $throwable;
 
 }

@@ -12,9 +12,9 @@ use Yii;
 use Exception;
 
 use vxm\async\Async;
-use vxm\async\Event;
-use vxm\async\ErrorEvent;
-use vxm\async\SuccessEvent;
+use vxm\async\event\Event;
+use vxm\async\event\ErrorEvent;
+use vxm\async\event\SuccessEvent;
 
 /**
  * Class AsyncTest
@@ -30,10 +30,10 @@ class AsyncTest extends TestCase
         $this->stopwatch->start('test');
 
         Yii::$app->async->run(function () {
-            usleep(5000);
+            usleep(1000);
         });
 
-        $this->assertLessThan(500, $this->stopwatch->stop('test')->getDuration());
+        $this->assertLessThan(100, $this->stopwatch->stop('test')->getDuration());
     }
 
     public function testWait()
@@ -41,10 +41,10 @@ class AsyncTest extends TestCase
         $this->stopwatch->start('test');
 
         Yii::$app->async->run(function () {
-            usleep(5000);
+            usleep(1000);
         })->wait();
 
-        $this->assertGreaterThan(500, $this->stopwatch->stop('test')->getDuration());
+        $this->assertGreaterThan(100, $this->stopwatch->stop('test')->getDuration());
     }
 
     public function testSuccessEvent()
@@ -87,7 +87,7 @@ class AsyncTest extends TestCase
         ])->wait();
 
         foreach ($exceptions as $exception) {
-            $this->assertEquals('Error', $exception->getMessage());
+
             $this->assertEquals(Exception::class, get_class($exception));
         }
 

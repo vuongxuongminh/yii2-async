@@ -7,35 +7,22 @@
 
 namespace vxm\test\unit\async;
 
-use Yii;
+use yii\console\Exception;
 
 use vxm\async\Task;
 
 /**
- * Class TaskRunnerTest
+ * Class TaskRunnerErrorTest
  *
  * @author Vuong Minh <vuongxuongminh@gmail.com>
  * @since 1.0.0
  */
-class TaskRunnerTest extends Task
+class TaskRunnerErrorTest extends Task
 {
-    /**
-     * @var \yii\console\Request
-     */
-    public $request;
-
-    /**
-     * @inheritDoc
-     */
-    public function init()
-    {
-
-
-        parent::init();
-    }
 
     public function run()
     {
-        return get_class(Yii::$app);
+        throw new Exception('Test Message');
     }
+
 }

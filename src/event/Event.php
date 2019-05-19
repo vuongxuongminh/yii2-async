@@ -19,7 +19,7 @@ class Event extends BaseEvent
 {
 
     /**
-     * @var Async object triggered this.
+     * @var \vxm\async\Async object triggered this.
      */
     public $sender;
 

@@ -52,7 +52,9 @@ new class
 
         if (isset($appConfig)) {
 
-            new \yii\console\Application($appConfig);
+            $appConfig['class'] = $appConfig['class'] ?? 'yii\console\Application';
+
+            Yii::createObject($appConfig);
         }
     }
 };

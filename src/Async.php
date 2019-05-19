@@ -37,7 +37,7 @@ use vxm\async\runtime\ParentRuntime;
  *
  * Yii::$app->async->run(function () {
  *
- *      sleep(15);
+ *      sleep(5);
  * });
  *
  * ```
@@ -48,7 +48,7 @@ use vxm\async\runtime\ParentRuntime;
  *
  * Yii::$app->async->run(function () {
  *
- *      sleep(15);
+ *      sleep(5);
  * })->wait();
  *
  * ```
@@ -59,15 +59,15 @@ use vxm\async\runtime\ParentRuntime;
  *
  * Yii::$app->async->run(function () {
  *
- *      sleep(15);
+ *      sleep(5);
  * });
  *
  * Yii::$app->async->run(function () {
  *
- *      sleep(15);
+ *      sleep(5);
  * });
  *
- * Yii::$app->async->wait(); // sleep 30s
+ * Yii::$app->async->wait();
  * ```
  *
  * @property string $autoload path of autoload file for runtime task execute environment.

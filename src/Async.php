@@ -219,6 +219,7 @@ class Async extends Component
      * Register global events to process given.
      *
      * @param Runnable $process need to add global events.
+     * @since 1.0.3
      */
     protected function registerProcessGlobalEvents(Runnable $process): void
     {

@@ -68,8 +68,7 @@ After add it to application components, now you can run an async code:
 ```php
 
 Yii::$app->async->run(function() {
-    
-    Yii::$app->mailer->compose('mail')->send();
+     // do a thing.
 });
 
 ```
@@ -120,9 +119,8 @@ Sometime you need to wait a code executed, just call `wait()` after `run()`:
 ```php
 
 Yii::$app->async->run(function() {
-    
-    sleep(10);
-})->wait(); // sleep 10s
+    // do a thing.
+})->wait();
 
 ```
 
@@ -130,17 +128,12 @@ Or you can wait multi tasks executed:
 
 ```php
 
-Yii::$app->async->run(function() {
-    
-    sleep(5);
-});
+Yii::$app->async->run([YourAsyncClass::class, 'handleA']);
+Yii::$app->async->run([YourAsyncClass::class, 'handleD']);
+Yii::$app->async->run([YourAsyncClass::class, 'handleC']);
+Yii::$app->async->run([YourAsyncClass::class, 'handleD']);
 
-Yii::$app->async->run(function() {
-    
-    sleep(10);
-});
-
-Yii::$app->async->wait(); // sleep 10s not 15s because it's run on multi processes
+$results = Yii::$app->async->wait(); // results return from tasks above.
 
 ```
 

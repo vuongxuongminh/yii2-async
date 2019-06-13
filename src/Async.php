@@ -13,7 +13,6 @@ use Throwable;
 
 use yii\base\Component;
 
-use Spatie\Async\Pool;
 use Spatie\Async\Process\Runnable;
 
 use vxm\async\event\Event;
@@ -132,31 +131,8 @@ class Async extends Component
     public function run($callable, array $callbacks = []): self
     {
         $process = $this->createProcess($callable);
-
-        foreach ($callbacks as $name => $callback) {
-
-            switch (strtolower($name)) {
-                case 'success':
-                    $process->then(Closure::fromCallable($callback));
-                    break;
-                case 'error':
-                case 'catch':
-                    $process->catch(Closure::fromCallable($callback));
-                    break;
-                case 'timeout':
-                    $process->timeout(Closure::fromCallable($callback));
-                    break;
-                default:
-                    break;
-            }
-
-        }
-
-        $process
-            ->then(Closure::fromCallable([$this, 'success']))
-            ->catch(Closure::fromCallable([$this, 'error']))
-            ->timeout(Closure::fromCallable([$this, 'timeout']));
-
+        $this->registerProcessEvents($callbacks, $process);
+        $this->registerProcessGlobalEvents($process);
         $this->pool->add($process);
 
         return $this;
@@ -213,11 +189,55 @@ class Async extends Component
     }
 
     /**
-     * Wait until all tasks done.
+     * Register events to process given.
+     *
+     * @param array $events register to process given.
+     * @param Runnable $process need to add events.
+     * @since 1.0.3
      */
-    public function wait(): void
+    protected function registerProcessEvents(array $events, Runnable $process): void
     {
-        $this->pool->wait();
+        foreach ($events as $event => $callable) {
+            switch (strtolower($event)) {
+                case 'success':
+                    $process->then(Closure::fromCallable($callable));
+                    break;
+                case 'error':
+                case 'catch':
+                    $process->catch(Closure::fromCallable($callable));
+                    break;
+                case 'timeout':
+                    $process->timeout(Closure::fromCallable($callable));
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+
+    /**
+     * Register global events to process given.
+     *
+     * @param Runnable $process need to add global events.
+     */
+    protected function registerProcessGlobalEvents(Runnable $process): void
+    {
+        $process->then(Closure::fromCallable([$this, 'success']));
+        $process->catch(Closure::fromCallable([$this, 'error']));
+        $process->timeout(Closure::fromCallable([$this, 'timeout']));
+    }
+
+    /**
+     * Wait until all tasks done.
+     *
+     * @since 1.0.3 return results of async processes.
+     */
+    public function wait()
+    {
+        $results = $this->pool->wait();
+        $this->pool->flush();
+
+        return $results;
     }
 
     /**

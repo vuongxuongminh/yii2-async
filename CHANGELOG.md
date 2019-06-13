@@ -1,6 +1,11 @@
 Change Log
 ==========================
 
+1.0.3
+--------------------------
+
+- Enh: Support `wait()` async method return results of waited tasks.
+
 1.0.2
 --------------------------
 
